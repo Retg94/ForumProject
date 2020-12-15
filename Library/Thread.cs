@@ -4,7 +4,13 @@ using System.Text;
 
 namespace Library
 {
-    class Thread
+    public class Thread
     {
+        public int ThreadId { get; }
+        public string ThreadName { get; set; }
+        public string ThreadText { get; set; }
+        public int UserId { get; }
+        public List<Post> PostsInThread { get; set; }
+
     }
 }
