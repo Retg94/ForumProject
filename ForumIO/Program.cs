@@ -8,6 +8,7 @@ namespace ForumIO
         public static bool LogInOkay = false;
         public static bool Running = true;
         public static string CurrentUser = string.Empty;
+        public static int CurrentUserId;
         static void Main(string[] args)
         {
 
@@ -45,6 +46,7 @@ namespace ForumIO
                 if(user.username == tmpUsername && user.password == tmpPassword)
                 {
                     CurrentUser = user.username;
+                    CurrentUserId = user.user_id;
                     Console.WriteLine("Login succed. Continue to main menu...");
                     LogInOkay = true;
                 }
@@ -63,6 +65,7 @@ namespace ForumIO
             Console.WriteLine("0. Exit program");
             Console.WriteLine("1. Logout");
             Console.WriteLine("2. Show threads");
+            Console.WriteLine("3. Create new thread");
             int input = int.Parse(Console.ReadLine());
             switch(input)
             {
@@ -79,6 +82,9 @@ namespace ForumIO
                 case 2:
                     ShowThreads();
                     break;
+                case 3:
+                    CreateNewThread();
+                    break;
                 default:
                     Console.WriteLine("Error");
                     Helper.PressAnyKeyToContinue();
@@ -92,11 +98,10 @@ namespace ForumIO
             Console.WriteLine("Showing all threads in the forum");
             int index = 1;
             foreach (var thread in threads)
-            {
-                var tmpUsername = UserRepository.GetUsernameById(thread.user_id);
+            {              
                 Console.WriteLine($"[{index}]");
                 Console.WriteLine($"Thread name: {thread.thread_name}");
-                Console.WriteLine($"Created by: {tmpUsername.username}");
+                Console.WriteLine($"Created by: {thread.createdBy}");
                 Console.WriteLine($"Thread text: {thread.thread_text}");
                 Console.WriteLine("---------------------------------");
                 index++;
@@ -109,7 +114,18 @@ namespace ForumIO
                 Console.WriteLine("Write the number infront of the thread you want to enter:");
                 isOkay = int.TryParse(Console.ReadLine(), out input);
             }
-            ShowThreadAndPosts(input);
+            index = 1;
+            int tmpThreadId = 0;
+            foreach(var thread in threads)
+            {
+                if (input == index)
+                {
+                    tmpThreadId = thread.thread_id;
+                    break;
+                }            
+                index++;
+            }
+            ShowThreadAndPosts(tmpThreadId);
             Helper.PressAnyKeyToContinue();
 
 
@@ -118,22 +134,34 @@ namespace ForumIO
         {
             Console.Clear();
             var thread = ThreadRepository.GetThreadById(id);
-            var tmpUsername = UserRepository.GetUsernameById(thread.user_id);
             Console.WriteLine($"Thread name: {thread.thread_name}");
-            Console.WriteLine($"Created by: {tmpUsername.username}");
+            Console.WriteLine($"Created by: {thread.createdBy}");
             Console.WriteLine($"Thread text: {thread.thread_text}");
             Console.WriteLine("---------------------------------");
             var posts = PostRepository.GetPosts(id);
             int index = 1;
             foreach(var post in posts)
             {
-                var tmpUsernameForPosts = UserRepository.GetUsernameById(post.user_id);
                 Console.WriteLine($"Post number:{index}");
-                Console.WriteLine($"Created by: {tmpUsernameForPosts.username}");
+                Console.WriteLine($"Created by: {post.createdBy}");
                 Console.WriteLine(post.post_text);
                 Console.WriteLine("---------------------------------");
                 index++;
             }
+        }
+        static void CreateNewThread()
+        {
+            Console.WriteLine("Write the name of the thread: ");
+            string tmpThreadName = Console.ReadLine();
+            Console.WriteLine("Write your thread text: ");
+            string tmpThreadText = Console.ReadLine();
+            var tmpThread = new Thread();
+            tmpThread.thread_name = tmpThreadName;
+            tmpThread.thread_text = tmpThreadText;
+            tmpThread.user_id = CurrentUserId;
+            ThreadRepository.CreateNewThread(tmpThread);
+            Console.WriteLine("New thread created.");
+            Helper.PressAnyKeyToContinue();
 
         }
     }
