@@ -6,10 +6,10 @@ namespace Library
 {
     public class Thread
     {
-        public int ThreadId { get; }
-        public string ThreadName { get; set; }
-        public string ThreadText { get; set; }
-        public int UserId { get; }
+        public int thread_id { get; }
+        public string thread_name { get; set; }
+        public string thread_text { get; set; }
+        public int user_id { get; }
         public List<Post> PostsInThread { get; set; }
 
     }

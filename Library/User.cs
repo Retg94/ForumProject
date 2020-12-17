@@ -6,9 +6,9 @@ namespace Library
 {
     public class User
     {
-        public int UserId { get;}
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public int user_id { get;}
+        public string username { get; set; }
+        public string password { get; set; }
         public List<Thread> ThreadsByUser { get; set; }
         public List <Post> PostsByUser { get; set; }
 

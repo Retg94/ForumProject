@@ -19,6 +19,15 @@ namespace Library
 
             return isOkay;
         }
+        public static bool VerifyIntBetween(int lower, int upper, int input)
+        {
+            bool isOkay = true;
+            if (input < lower)
+                isOkay = false;
+            if (input > upper)
+                isOkay = false;
+            return isOkay;
+        }
         public static void PressAnyKeyToContinue()
         {
             Console.WriteLine("Press any key to continue..");

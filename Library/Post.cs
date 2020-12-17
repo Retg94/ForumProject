@@ -6,9 +6,9 @@ namespace Library
 {
     public class Post
     {
-        public int PostId { get; }
-        public string PostText { get; set; }
-        public int UserId { get; }
-        public int ThreadId { get; }
+        public int post_id { get; }
+        public string post_text { get; set; }
+        public int user_id { get; }
+        public int thread_id { get; }
     }
 }
