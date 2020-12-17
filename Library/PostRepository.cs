@@ -15,7 +15,7 @@ namespace Library
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
-                var posts = connection.Query<Post>($"SELECT * FROM post WHERE thread_id={id}");
+                var posts = connection.Query<Post>($"SELECT post_id, post_text, username AS createdBy FROM post JOIN user ON post.user_id = user.user_id WHERE thread_id={id};");
                 return posts.ToList();
             }
 

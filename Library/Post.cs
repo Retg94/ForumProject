@@ -10,5 +10,6 @@ namespace Library
         public string post_text { get; set; }
         public int user_id { get; }
         public int thread_id { get; }
+        public string createdBy { get; }
     }
 }
