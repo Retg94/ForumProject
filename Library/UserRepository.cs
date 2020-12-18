@@ -27,7 +27,14 @@ namespace Library
                 return user;
             }
         }
-
+        public static void CreateNewUser(User user)
+        {
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                var sql = "INSERT INTO user (username, password)" + " VALUES(@username, @password)";
+                connection.Execute(sql, user);
+            }
+        }
 
     }
 }
