@@ -19,19 +19,21 @@ namespace Library
                 return threads.ToList();
             }
         }
-        public static Thread GetThreadByThreadId(int id)
+        public static Thread GetThreadByThreadId(Thread thread)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
-                var thread = connection.QueryFirst<Thread>($"SELECT thread_id, thread_name, thread_text, username AS createdBy FROM thread JOIN user ON thread.user_id = user.user_id WHERE thread_id={id}");
+                var sql = $"SELECT thread_id, thread_name, thread_text, username AS createdBy FROM thread JOIN user ON thread.user_id = user.user_id WHERE thread_id=@thread_id";
+                var tmpThread = connection.QueryFirst<Thread>(sql, thread);
                 return thread;   
             }
         }
-        public static List<Thread> GetThreadsByUserId(int id)
+        public static List<Thread> GetThreadsByUserId(User user)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
-                var threads = connection.Query<Thread>($"SELECT thread_id, thread_name, thread_text, username AS createdBy FROM thread JOIN user ON thread.user_id = user.user_id WHERE thread.user_id={id}");
+                var sql = $"SELECT thread_id, thread_name, thread_text, username AS createdBy FROM thread JOIN user ON thread.user_id = user.user_id WHERE thread.user_id=@user_id";
+                var threads = connection.Query<Thread>(sql, user);
                 return threads.ToList();
             }
         }

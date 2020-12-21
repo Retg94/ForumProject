@@ -138,7 +138,13 @@ namespace ForumIO
             Console.WriteLine("1. Logout");
             Console.WriteLine("2. Show threads");
             Console.WriteLine("3. Handle your threads");
-            int input = int.Parse(Console.ReadLine());
+            bool isOkay = int.TryParse(Console.ReadLine(), out int input);
+            while (!isOkay || !Helper.VerifyIntBetween(0, 3, input))
+            {
+                Console.WriteLine("You can only enter numbers that exists infront of the choices. Try again.");
+                Console.WriteLine("Write the number infront one of the options:");
+                isOkay = int.TryParse(Console.ReadLine(), out input);
+            }
             switch(input)
             {
                 case 0:
@@ -172,7 +178,7 @@ namespace ForumIO
             int amount = 0;
             foreach (var thread in threads)
             {
-                var posts = PostRepository.GetPosts(thread.thread_id);
+                var posts = PostRepository.GetPosts(thread);
                 amount = posts.Count;
                 Console.WriteLine($"[{index}]");
                 Console.WriteLine($"Thread name: {thread.thread_name}");
@@ -191,18 +197,18 @@ namespace ForumIO
                 isOkay = int.TryParse(Console.ReadLine(), out input);
             }
             index = 1;
-            int tmpThreadId = 0;
+            var tmpThread = new Thread();
             foreach(var thread in threads)
             {
                 if (input == index)
                 {
-                    tmpThreadId = thread.thread_id;
+                    tmpThread = thread;
                     break;
                 }            
                 index++;
             }
-            ShowThreadAndPosts(tmpThreadId);
-            PostsChoices(tmpThreadId);
+            ShowThreadAndPosts(tmpThread);
+            PostsChoices(tmpThread);
         }
         static void ShowThreadsFromList(List<Thread> threads)
         {
@@ -217,9 +223,9 @@ namespace ForumIO
                 index++;
             }
         }
-        static void ShowPosts(int threadId)
+        static void ShowPosts(Thread thread)
         {
-            var posts = PostRepository.GetPosts(threadId);
+            var posts = PostRepository.GetPosts(thread);
             int index = 1;
             foreach (var post in posts)
             {
@@ -230,9 +236,9 @@ namespace ForumIO
                 index++;
             }
         }
-        static List<Post> GetPostByCurrentUser(int threadId)
+        static List<Post> GetPostByCurrentUser(Thread thread)
         {
-            var posts = PostRepository.GetPosts(threadId);
+            var posts = PostRepository.GetPosts(thread);
             var postsByUser = new List<Post>();
             foreach(var post in posts)
             {
@@ -243,15 +249,15 @@ namespace ForumIO
             }
             return postsByUser;
         }
-        static void ShowThreadAndPosts(int id)
+        static void ShowThreadAndPosts(Thread thread)
         {
             Console.Clear();
-            var thread = ThreadRepository.GetThreadByThreadId(id);
+            var tmpThread = ThreadRepository.GetThreadByThreadId(thread);
             Console.WriteLine($"Thread name: {thread.thread_name}");
             Console.WriteLine($"Created by: {thread.createdBy}");
             Console.WriteLine($"Thread text: {thread.thread_text}");
             Console.WriteLine("---------------------------------");
-            ShowPosts(id);
+            ShowPosts(tmpThread);
         }
         static void ThreadChoices()
         {
@@ -293,7 +299,7 @@ namespace ForumIO
         static void DeleteThread()
         {
             Console.Clear();
-            var threadsByUser = ThreadRepository.GetThreadsByUserId(CurrentUser.user_id);
+            var threadsByUser = ThreadRepository.GetThreadsByUserId(CurrentUser);
             bool isEmpty = !threadsByUser.Any();
             if (!isEmpty)
             {
@@ -328,7 +334,7 @@ namespace ForumIO
         static void UpdateThread()
         {
             Console.Clear();
-            var threadsByUser = ThreadRepository.GetThreadsByUserId(CurrentUser.user_id);
+            var threadsByUser = ThreadRepository.GetThreadsByUserId(CurrentUser);
             bool isEmpty = !threadsByUser.Any();
             if(!isEmpty)
             {
@@ -395,7 +401,7 @@ namespace ForumIO
             }
             Helper.PressAnyKeyToContinue();
         }
-        static void PostsChoices(int threadId)
+        static void PostsChoices(Thread thread)
         {
             Console.WriteLine("What do you want to do now?");
             Console.WriteLine("0. Get back to mainmenu.");
@@ -417,13 +423,13 @@ namespace ForumIO
                     Helper.PressAnyKeyToContinue();
                     break;
                 case 1:
-                    CreateNewPost(threadId);
+                    CreateNewPost(thread);
                     break;
                 case 2:
-                    UpdatePost(threadId);
+                    UpdatePost(thread);
                     break;
                 case 3:
-                    DeletePost(threadId);
+                    DeletePost(thread);
                     break;
                 default:
                     Console.WriteLine("Error");
@@ -431,7 +437,7 @@ namespace ForumIO
                     break;
             }
         }
-        static void CreateNewPost(int threadId)
+        static void CreateNewPost(Thread thread)
         {
             Console.WriteLine("Write your post text: ");
             string tmpPostText = Console.ReadLine();
@@ -439,14 +445,14 @@ namespace ForumIO
             var tmpPost = new Post();
             tmpPost.post_text = tmpPostText;
             tmpPost.user_id = CurrentUser.user_id;
-            tmpPost.thread_id = threadId; 
+            tmpPost.thread_id = thread.thread_id; 
             PostRepository.CreateNewPost(tmpPost);
             Console.WriteLine("New post created.");
             Helper.PressAnyKeyToContinue();
         }
-        static void UpdatePost(int threadId)
+        static void UpdatePost(Thread thread)
         {
-            var postsByUser = GetPostByCurrentUser(threadId);
+            var postsByUser = GetPostByCurrentUser(thread);
             bool isEmpty = !postsByUser.Any();
             if (!isEmpty)
             {
@@ -489,9 +495,9 @@ namespace ForumIO
             }
             Helper.PressAnyKeyToContinue();
         }
-        static void DeletePost(int threadId)
+        static void DeletePost(Thread thread)
         {
-            var postsByUser = GetPostByCurrentUser(threadId);
+            var postsByUser = GetPostByCurrentUser(thread);
             bool isEmpty = !postsByUser.Any();
             if(!isEmpty)
             {

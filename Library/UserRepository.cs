@@ -19,14 +19,6 @@ namespace Library
                 return users.ToList();
             }
         }
-        public static User GetUsernameById(int id)
-        {
-            using (var connection = new SqliteConnection(_connectionString))
-            {
-                var user = connection.QueryFirst<User>($"SELECT * FROM user WHERE user_id={id}");
-                return user;
-            }
-        }
         public static void CreateNewUser(User user)
         {
             using (var connection = new SqliteConnection(_connectionString))
